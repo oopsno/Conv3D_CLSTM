@@ -2,64 +2,75 @@
 
 > [English][en] | [简体中文][hans]
 
-## Prerequisites
+## 依赖
 
 + TensorFlow 1.0.0+
 + Keras 2.0.2+
 
-See [requirements.txt][req].
+详见 [requirements.txt][req].
 
-## Setup
+## 配置
 
 ### Linux / macOS
 
+克隆本仓库
 ```shell
-# Clone this repo
 git clone https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
+```
 
-# [optional] Create a virtual environment and activate it
+[可选] 使用 `virtualenv` 创建并激活一个虚拟环境
+```shell
 virtualenv Conv3D_CLSTM
 source bin/activate
+```
 
-# install requirements
+安装依赖项
+```shell
 pip install -r requirements.txt
 ```
 
 ### Windows
 
-#### The hard way
+#### 默认发行版
 
-> May get stuck while installing scipy.
-> If so, try Anaconda.
+> 如果在安装 Scipy 时遭遇问题，请尝试使用 Anaconda 发行版。
 
+克隆本仓库
 ```cmd
-:: Clone this repo
 git clone https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
+```
 
-# [optional] Create a virtual environment and activate it
+[可选] 使用 `virtualenv` 创建并激活一个虚拟环境
+```cmd
 virtualenv Conv3D_CLSTM
 cd Script
 activate
 cd ..
+```
 
-# install requirements
+安装依赖项
+```cmd
 pip install -r requirements.txt
 ```
 
-#### Using The Anaconda Distribution
+#### Anaconda 发行版
 
+克隆本仓库
 ```cmd
-:: Clone this repo
 git clone https://github.com/oopsno/Conv3D_CLSTM.git
-cd Conv3D_CLSTM
+cd Conv4D_CLSTM
+```
 
-# [optional] Create a virtual environment and activate it
-conda create -n Conv3D_CLSTM
-activate Conv3D_CLSTM
+[可选] 使用 `conda` 创建并激活一个虚拟环境
+```cmd
+conda create -n Conv3D-CLSTM
+activate Conv3D-CLSTM
+```
 
-# install requirements
+安装依赖项
+```
 pip install -r requirements.txt
 ```
 
