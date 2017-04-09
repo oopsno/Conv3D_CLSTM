@@ -5,7 +5,7 @@ import tensorflow as tf
 slim = tf.contrib.slim
 import tensorlayer as tl
 from tensorflow.python.framework import ops
-import ConvLSTMCell as clstm
+from ConvLSTMCell import ConvLSTMCell as clstm
 
 def c3d_clstm(inputs, num_classes, reuse, is_training):
   """Builds the Conv3D-ConvLSTM Networks."""
