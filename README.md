@@ -63,6 +63,13 @@ activate Conv3D_CLSTM
 pip install -r requirements.txt
 ```
 
+## Training
+
+Say, if you wanna train an RGB-based model on IsoGR
+
+1. modify `configurations/isogr_rgb.yaml`
+2. `python training_isogr.py configurations/isogr_rgb.yaml`
+
 [en]:   https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README.md
 [req]:  https://github.com/oopsno/Conv3D_CLSTM/blob/keras/requirements.txt
 [hans]: https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README-zh-cmn-Hans.md

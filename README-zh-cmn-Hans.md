@@ -74,6 +74,13 @@ activate Conv3D-CLSTM
 pip install -r requirements.txt
 ```
 
+## 训练
+
+以在 IsoGR 数据集上使用 RGB 数据训练为例
+
+1. 修改 `configurations/isogr_rgb.yaml`
+2. `python training_isogr.py configurations/isogr_rgb.yaml`
+
 [en]:   https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README.md
 [req]:  https://github.com/oopsno/Conv3D_CLSTM/blob/keras/requirements.txt
 [hans]: https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README-zh-cmn-hans.md
