@@ -38,13 +38,13 @@ pip install -r requirements.txt
 git clone https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 
-# [optional] Create a virtual environment and activate it
+:: [optional] Create a virtual environment and activate it
 virtualenv Conv3D_CLSTM
 cd Script
 activate
 cd ..
 
-# install requirements
+:: install requirements
 pip install -r requirements.txt
 ```
 
@@ -55,14 +55,14 @@ pip install -r requirements.txt
 git clone https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 
-# [optional] Create a virtual environment and activate it
+:: [optional] Create a virtual environment and activate it
 conda create -n Conv3D_CLSTM
 activate Conv3D_CLSTM
 
-# install requirements
+:: install requirements
 pip install -r requirements.txt
 ```
 
 [en]:   https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README.md
 [req]:  https://github.com/oopsno/Conv3D_CLSTM/blob/keras/requirements.txt
-[hans]: https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README-zh-cmn-hans.md
+[hans]: https://github.com/oopsno/Conv3D_CLSTM/blob/keras/README-zh-cmn-Hans.md
