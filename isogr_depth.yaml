@@ -1,0 +1,18 @@
+seq_len: 32
+batch_size: 13
+n_epoch: 1000
+learning_rate: 0.1
+decay_steps: 15000
+decay_rate : 0.1
+weight_decay: 0.004
+print_freq: 20
+queue_num: 5
+start_step: 0
+
+num_classes: 249
+dataset_name: isogr_depth
+training_datalist: /ssd/dataset/IsoGD_Image/train_depth_list.txt
+testing_datalist: /ssd/dataset/IsoGD_Image/valid_depth_list.txt
+
+# modify below if you want to use a custom loader
+# data_loader: inputs.prepare_isogr_depth_data

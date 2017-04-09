@@ -1,36 +1,44 @@
 # encoding: UTF-8
 from __future__ import print_function, division
 
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-import io
+import config
 import sys
 import numpy as np
 import tensorflow as tf
-slim = tf.contrib.slim
 import tensorlayer as tl
-import inputs as data
-import c3d_clstm as net 
+import inputs
+import c3d_clstm as net
 import time
 from datetime import datetime
 import threading
 from seven import StringIO
+slim = tf.contrib.slim
 
-seq_len = 32
-batch_size = 13
-n_epoch = 1000
-learning_rate = 0.1
-decay_steps = 15000
-decay_rate  = 0.1
-weight_decay= 0.004
-print_freq = 20
-queue_num = 5
-start_step = 0
+# loading configuration
+# TODO improve UX
+if len(sys.argv) != 2:
+  print('Usage: python {} [config.yaml]'.format(sys.argv[0]))
+  exit(-1)
 
-num_classes = 249
-dataset_name = 'isogr_depth'
-training_datalist = '/ssd/dataset/IsoGD_Image/train_depth_list.txt'
-testing_datalist = '/ssd/dataset/IsoGD_Image/valid_depth_list.txt'
+cfg_file = sys.argv[-1]
+cfg = config.Configuration(cfg_file)
+
+seq_len = cfg.seq_len
+batch_size = cfg.batch_size
+n_epoch = cfg.n_epoch
+learning_rate = cfg.learning_rate
+decay_steps = cfg.decay_steps
+decay_rate = cfg.decay_rate
+weight_decay = cfg.weight_decay
+print_freq = cfg.print_freq
+queue_num = cfg.queue_num
+start_step = cfg.start_step
+
+num_classes = cfg.num_classes
+dataset_name = cfg.dataset_name
+training_datalist = cfg.training_datalist
+testing_datalist = cfg.testing_datalist
+data_loader = cfg.data_loader
 
 curtime = '%s' % datetime.now()
 d = curtime.split(' ')[0]
@@ -69,49 +77,43 @@ l2_cost = tf.contrib.layers.l2_regularizer(weight_decay)(networks.all_params[0])
 cost = networks_cost + l2_cost 
   
 # Decay the learning rate exponentially based on the number of steps.
-#global_step = tf.Variable(start_step*2, trainable=False)
-#lr = tf.train.exponential_decay(learning_rate,
-#                                global_step,
-#                                decay_steps,
-#                                decay_rate,
-#                                staircase=True)
-#lr2 = tf.train.exponential_decay(learning_rate*10,
-#                                global_step,
-#                                decay_steps,
-#                                decay_rate,
-#                                staircase=True)
-#var_list1 = networks.all_params[:24] 
-#var_list2 = networks.all_params[24:]
-#opt1 = tf.train.GradientDescentOptimizer(lr)
-#opt2 = tf.train.GradientDescentOptimizer(lr2)
-#grads = tf.gradients(cost, var_list1 + var_list2)
-#grads1 = grads[:len(var_list1)]
-#grads2 = grads[len(var_list1):]
-#train_op1 = opt1.apply_gradients(zip(grads1, var_list1), global_step=global_step)
-#train_op2 = opt2.apply_gradients(zip(grads2, var_list2), global_step=global_step)
-#train_op = tf.group(train_op1, train_op2)
-global_step = tf.Variable(start_step, trainable=False)
-lr = tf.train.exponential_decay(learning_rate,
+global_step = tf.Variable(start_step*2, trainable=False)
+lr1 = tf.train.exponential_decay(learning_rate,
                                 global_step,
                                 decay_steps,
                                 decay_rate,
                                 staircase=True)
-train_params = networks.all_params
-train_op = tf.train.GradientDescentOptimizer(lr).minimize(cost, 
-                                       var_list=train_params,
-                                       global_step=global_step)
+lr2 = tf.train.exponential_decay(learning_rate*10,
+                                global_step,
+                                decay_steps,
+                                decay_rate,
+                                staircase=True)
+var_list1 = networks.all_params[:24] 
+var_list2 = networks.all_params[24:]
+opt1 = tf.train.GradientDescentOptimizer(lr1)
+opt2 = tf.train.GradientDescentOptimizer(lr2)
+grads = tf.gradients(cost, var_list1 + var_list2)
+grads1 = grads[:len(var_list1)]
+grads2 = grads[len(var_list1):]
+train_op1 = opt1.apply_gradients(zip(grads1, var_list1), global_step=global_step)
+train_op2 = opt2.apply_gradients(zip(grads2, var_list2), global_step=global_step)
+train_op = tf.group(train_op1, train_op2)
 
 sess.run(tf.initialize_all_variables())
+
 if start_step>0:
   load_params = tl.files.load_npz(name='%s_model_iter_%d.npz'%(dataset_name, start_step))
   tl.files.assign_params(sess, load_params, networks)
+else:
+  load_params = tl.files.load_npz(name='isogr_rgb_model_iter_60000.npz')
+  tl.files.assign_params(sess, load_params[0:24], networks)
 networks.print_params(True)
   
 # Data Reading
-X_train,y_train = data.load_video_list(training_datalist)
+X_train,y_train = inputs.load_video_list(training_datalist)
 X_tridx = np.asarray(np.arange(0, len(y_train)), dtype=np.int32)
 y_train = np.asarray(y_train, dtype=np.int32)
-X_test,y_test = data.load_video_list(testing_datalist)
+X_test,y_test = inputs.load_video_list(testing_datalist)
 X_teidx = np.asarray(np.arange(0, len(y_test)), dtype=np.int32)
 y_test  = np.asarray(y_test, dtype=np.int32)
   
@@ -152,7 +154,7 @@ def training_data_read():
       image_info = zip(image_path,image_fcnt,image_olen,is_training)
       X_data_a[wr_pos*batch_size:(wr_pos+1)*batch_size,:,:,:,:] = \
                   tl.prepro.threading_data([_ for _ in image_info], 
-                                           data.prepare_isogr_depth_data)
+                                           data_loader)
       y_label_a[wr_pos*batch_size:(wr_pos+1)*batch_size] = y_labels
       # 3. Update flags
       rdwr_lock.acquire()
@@ -194,7 +196,7 @@ for epoch in range(n_epoch):
                  y: y_label_a[rd_pos*batch_size:(rd_pos+1)*batch_size]}
     feed_dict.update(networks.all_drop)
     start_time = time.time()
-    _,loss_value,lr_value,acc = sess.run([train_op,cost,lr,networks_accu], feed_dict=feed_dict)
+    _,loss_value,lr_value,acc = sess.run([train_op,cost,lr1,networks_accu], feed_dict=feed_dict)
     duration = time.time() - start_time
     # 3. Update flags
     rdwr_lock.acquire()
@@ -220,45 +222,45 @@ for epoch in range(n_epoch):
                       '\n'])
       log.flush()
     step = step + 1
-
-  tl.files.save_npz(networks.all_params, 
-                    name='%s_model_iter_%d.npz'%(dataset_name, step), 
-                    sess=sess)
-  print("Model saved in file: %s_model_iter_%d.npz" %(dataset_name, step))
-
-  # Test Stage
-  average_accuracy = 0.0
-  test_iterations = 0;
-  for X_indices, y_label_t in tl.iterate.minibatches(X_teidx, 
-                                                     y_test, 
-                                                     batch_size, 
-                                                     shuffle=True):
-    # Read data for each batch      
-    image_path = []
-    image_fcnt = []
-    image_olen = []
-    is_training = []
-    for data_a in range(batch_size):
-      X_index_a = X_indices[data_a]
-      key_str = '%06d' % X_index_a
-      image_path.append(X_test[key_str]['videopath'])
-      image_fcnt.append(X_test[key_str]['framecnt'])
-      image_olen.append(seq_len)
-      is_training.append(False) # Testing
-    image_info = zip(image_path,image_fcnt,image_olen,is_training)
-    X_data_t = tl.prepro.threading_data([_ for _ in image_info], 
-                                        data.prepare_isogr_depth_data)
-    feed_dict = {x: X_data_t, y: y_label_t}
-    dp_dict = tl.utils.dict_to_one(predictons.all_drop)
-    feed_dict.update(dp_dict)
-    _,accu_value = sess.run([predicton_y_op, predicton_accu], feed_dict=feed_dict)
-    average_accuracy = average_accuracy + accu_value
-    test_iterations = test_iterations + 1
-  average_accuracy = average_accuracy / test_iterations
-  format_str = ('%s: epoch = %d, average_accuracy = %.6f')
-  print (format_str % (datetime.now(), epoch, average_accuracy))
-  log.writelines([format_str % (datetime.now(), epoch, average_accuracy), '\n'])
-  log.flush()
+    if step%300 == 0:
+      tl.files.save_npz(networks.all_params, 
+                        name='%s_model_iter_%d.npz'%(dataset_name, step), 
+                        sess=sess)
+      print("Model saved in file: %s_model_iter_%d.npz" %(dataset_name, step))
+    
+      # Test Stage
+      average_accuracy = 0.0
+      test_iterations = 0;
+      for X_indices, y_label_t in tl.iterate.minibatches(X_teidx, 
+                                                         y_test, 
+                                                         batch_size, 
+                                                         shuffle=True):
+        # Read data for each batch      
+        image_path = []
+        image_fcnt = []
+        image_olen = []
+        is_training = []
+        for data_a in range(batch_size):
+          X_index_a = X_indices[data_a]
+          key_str = '%06d' % X_index_a
+          image_path.append(X_test[key_str]['videopath'])
+          image_fcnt.append(X_test[key_str]['framecnt'])
+          image_olen.append(seq_len)
+          is_training.append(False) # Testing
+        image_info = zip(image_path,image_fcnt,image_olen,is_training)
+        X_data_t = tl.prepro.threading_data([_ for _ in image_info], 
+                                            data_loader)
+        feed_dict = {x: X_data_t, y: y_label_t}
+        dp_dict = tl.utils.dict_to_one(predictons.all_drop)
+        feed_dict.update(dp_dict)
+        _,accu_value = sess.run([predicton_y_op, predicton_accu], feed_dict=feed_dict)
+        average_accuracy = average_accuracy + accu_value
+        test_iterations = test_iterations + 1
+      average_accuracy = average_accuracy / test_iterations
+      format_str = ('%s: epoch = %d, average_accuracy = %.6f')
+      print (format_str % (datetime.now(), epoch, average_accuracy))
+      log.writelines([format_str % (datetime.now(), epoch, average_accuracy), '\n'])
+      log.flush()
 
 # In the end, close TensorFlow session.
 log.close()

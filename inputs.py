@@ -3,6 +3,7 @@
 import math
 import os
 import random
+import sys
 
 import numpy as np
 import six
@@ -11,6 +12,15 @@ import scipy.misc
 if not six.PY2:
     from seven import xrange
 
+__data_loaders__ = {}
+
+
+def register(name):
+    def __register__(fn):
+        __data_loaders__[name] = fn
+        return fn
+
+    return __register__
 
 def load_video_list(path):
     assert os.path.exists(path)
@@ -31,6 +41,7 @@ def load_video_list(path):
     return video_data, video_label
 
 
+@register('isogr_rgb')
 def prepare_isogr_rgb_data(image_info):
     video_path = image_info[0]
     video_frame_cnt = image_info[1]
@@ -79,6 +90,7 @@ def prepare_isogr_rgb_data(image_info):
     return processed_images
 
 
+@register('isogr_depth')
 def prepare_isogr_depth_data(image_info):
     video_path = image_info[0]
     video_frame_cnt = image_info[1]
@@ -127,6 +139,7 @@ def prepare_isogr_depth_data(image_info):
     return processed_images
 
 
+@register('skig_rgb')
 def prepare_skig_rgb_data(image_info):
     video_path = image_info[0]
     video_frame_cnt = image_info[1]
@@ -174,6 +187,7 @@ def prepare_skig_rgb_data(image_info):
     return processed_images
 
 
+@register('skig_depth')
 def prepare_skig_depth_data(image_info):
     video_path = image_info[0]
     video_frame_cnt = image_info[1]
@@ -219,3 +233,10 @@ def prepare_skig_depth_data(image_info):
         image_crop = image[crop_h:crop_h + square_sz, crop_w:crop_w + square_sz, ::]
         processed_images[idx] = scipy.misc.imresize(image_crop, (112, 112)) - average_values
     return processed_images
+
+
+def get_data_loader(dataset_name):
+    try:
+        return __data_loaders__[dataset_name]
+    except KeyError:
+        sys.stderr.write('Connot find data loader for dataset \'{}\''.format(dataset_name))
