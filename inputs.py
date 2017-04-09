@@ -5,6 +5,10 @@ import math
 import random
 import numpy as np
 from scipy.misc import imread, imresize
+import six
+
+if not six.PY2:
+  from seven import xrange
 
 
 def load_video_list(path):
