@@ -13,9 +13,9 @@
 
 ### Linux / macOS
 
-克隆本仓库
+克隆本项目及其依赖
 ```shell
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 ```
 
@@ -36,9 +36,9 @@ pip install -r requirements.txt
 
 > 如果在安装 Scipy 时遭遇问题，请尝试使用 Anaconda 发行版。
 
-克隆本仓库
+克隆本项目及其依赖
 ```cmd
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 ```
 
@@ -57,9 +57,9 @@ pip install -r requirements.txt
 
 #### Anaconda 发行版
 
-克隆本仓库
+克隆本项目及其依赖
 ```cmd
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv4D_CLSTM
 ```
 

@@ -15,7 +15,7 @@ See [requirements.txt][req].
 
 ```shell
 # Clone this repo
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 
 # [optional] Create a virtual environment and activate it
@@ -35,7 +35,7 @@ pip install -r requirements.txt
 
 ```cmd
 :: Clone this repo
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 
 :: [optional] Create a virtual environment and activate it
@@ -52,7 +52,7 @@ pip install -r requirements.txt
 
 ```cmd
 :: Clone this repo
-git clone https://github.com/oopsno/Conv3D_CLSTM.git
+git clone --recursive https://github.com/oopsno/Conv3D_CLSTM.git
 cd Conv3D_CLSTM
 
 :: [optional] Create a virtual environment and activate it
