@@ -1,4 +1,3 @@
-[submodule "ConvLSTMCell"]
-	path = ConvLSTMCell
-	url = https://github.com/oopsno/ConvLSTMCell-tensorflow.git
-	branch = hack
+[submodule "convlstm"]
+	path = convlstm
+	url = https://github.com/carlthome/tensorflow-convlstm-cell.git
